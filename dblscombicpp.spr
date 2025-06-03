@@ -7,6 +7,6 @@
 0005 ◎ C 06/03 06/03 0.001│ToDo│Schedule::print_oppo_counts()
 0006 ◎ C 06/03 06/03 0.001│問題│初期ラウンドのみのとき、oppo_counts[] が更新されていない
 0007 ◎ C 06/03 06/04 0.001│ToDo│pair_counts, oppo_counts 平均・標準偏差計算・表示
-0008 ● C 06/03            │ToDo│
+0008 ◎ C 06/03 06/04 0.001│ToDo│Schedule::add_random_round()
 0009 ● C 06/03            │ToDo│
 0010 ● C 06/03            │ToDo│

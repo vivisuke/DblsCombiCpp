@@ -1,7 +1,11 @@
 #include <iostream>
+#include <random>
 #include "Schedule.h"
 
 using namespace std;
+
+std::mt19937 rgen(std::random_device{}()); // シードを設定
+//std::mt19937 rgen(0); // シードを設定
 
 //----------------------------------------------------------------------
 void Round::print() const {
@@ -155,4 +159,36 @@ void Schedule::calc_oppo_counts_ave_std(double& ave, double& std) const {
 	int n = (m_num_players - 1) * m_num_players;
 	ave = (double)sum / n;
 	std = sqrt((double)sum2/n - ave*ave);
+}
+
+void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {
+	lst.clear();
+	for(int i = 0; i != m_num_players; ++i) {
+		int last = m_resting_pid + m_num_resting;
+		if( last < m_num_players ) {
+			if( i < m_resting_pid || i >= last ) {
+				lst.push_back(i);
+			}
+		} else {
+			last %= m_num_players;
+			if( i < m_resting_pid && i >= last ) {
+				lst.push_back(i);
+			}
+		}
+	}
+}
+//	ペア・対戦相手をランダムに決める
+void Schedule::add_random_round() {
+	m_resting_pid -= m_num_resting;
+	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
+	m_rounds.resize(m_rounds.size() + 1);
+	auto& round = m_rounds.back();
+	//vector<PlayerId> lst;
+	make_not_resting_players_list(round.m_playing);
+	shuffle(round.m_playing.begin(), round.m_playing.end(), rgen);
+	round.m_resting.clear();
+	for(int i = 0; i < m_num_resting; ++i)
+		round.m_resting.push_back((m_resting_pid + i) % m_num_players);
+	update_pair_counts(round);
+	update_oppo_counts(round);
 }

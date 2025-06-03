@@ -11,7 +11,7 @@ using PlayerId = short;						//	0オリジン
 
 //	各ラウンドでの試合組み合わせ
 struct Round {
-	std::vector<PlayerId>	m_playing;		//	休憩中プレイヤーリスト
+	std::vector<PlayerId>	m_playing;		//	非休憩中プレイヤーリスト
 	std::vector<PlayerId>	m_resting;		//	休憩中プレイヤーリスト
 public:
 	void	print() const;
@@ -43,6 +43,7 @@ struct Schedule
 	void	print() const;
 	void	print_pair_counts() const;
 	void	print_oppo_counts() const;
+	void	make_not_resting_players_list(std::vector<PlayerId>&);		//	非休憩プレイヤーリスト取得
 	void	build_first_round();
 	void	init_pair_counts();				//	
 	void	update_pair_counts(const Round&);			//	
@@ -55,5 +56,7 @@ struct Schedule
 	void	count_oppo_counts();				//	各プレイヤーが同じ相手と何回対戦したかを計算
 	void	calc_pair_counts_ave_std(double&, double&) const;
 	void	calc_oppo_counts_ave_std(double&, double&) const;
+
+	void	add_random_round();
 };
 
