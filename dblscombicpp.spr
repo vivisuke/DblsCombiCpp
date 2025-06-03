@@ -3,8 +3,8 @@
 0001 ◎ C 06/03 06/03 0.001│ToDo│プロジェクト作成
 0002 ◎ C 06/03 06/03 0.001│ToDo│Schedule クラス追加
 0003 ◎ C 06/03 06/03 0.001│ToDo│Schedule コンストラクタ等実装
-0004 ● C 06/03            │ToDo│
-0005 ● C 06/03            │ToDo│
+0004 ◎ C 06/03 06/03 0.001│ToDo│Schedule::print_pair_counts()
+0005 ◎ C 06/03 06/03 0.001│ToDo│Schedule::print_oppo_counts()
 0006 ● C 06/03            │ToDo│
 0007 ● C 06/03            │ToDo│
 0008 ● C 06/03            │ToDo│

@@ -41,6 +41,36 @@ void Schedule::print() const {
 	}
 	cout << endl;
 }
+void Schedule::print_pair_counts() const {
+	cout << "pair counts:" << endl;
+	int pid = 0;
+	for(int p1 = 0; p1 < m_num_players; ++p1) {
+		printf("%3d: " , ++pid);
+		for(int p2 = 0; p2 < m_num_players; ++p2) {
+			if( p1 != p2 )
+				cout << m_pair_counts[p1][p2] << " ";
+			else
+				cout << "- ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
+void Schedule::print_oppo_counts() const {
+	cout << "opponent counts:" << endl;
+	int pid = 0;
+	for(int p1 = 0; p1 < m_num_players; ++p1) {
+		printf("%3d: " , ++pid);
+		for(int p2 = 0; p2 < m_num_players; ++p2) {
+			if( p1 != p2 )
+				cout << m_oppo_counts[p1][p2] << " ";
+			else
+				cout << "- ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
 void Schedule::build_first_round() {
 	if( m_num_resting < 0 ) return;		//	人数・コート数エラーの場合
 	m_rounds.resize(1);

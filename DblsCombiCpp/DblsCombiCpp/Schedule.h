@@ -41,6 +41,8 @@ struct Schedule
 		count_oppo_counts();
 	}
 	void	print() const;
+	void	print_pair_counts() const;
+	void	print_oppo_counts() const;
 	void	build_first_round();
 	void	init_pair_counts();				//	
 	void	update_pair_counts(const Round&);			//	
