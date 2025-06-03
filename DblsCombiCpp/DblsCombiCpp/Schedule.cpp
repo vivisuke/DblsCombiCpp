@@ -102,6 +102,21 @@ void Schedule::init_oppo_counts() {
 		for(auto& u: v) u = 0;
 	}
 }
+void Schedule::update_oppo_counts(const Round& round) {
+	for(int i = 0; i < round.m_playing.size(); i += 4) {
+		m_oppo_counts[round.m_playing[i]][round.m_playing[i+2]] += 1;
+		m_oppo_counts[round.m_playing[i]][round.m_playing[i+3]] += 1;
+		m_oppo_counts[round.m_playing[i+1]][round.m_playing[i+2]] += 1;
+		m_oppo_counts[round.m_playing[i+1]][round.m_playing[i+3]] += 1;
+		m_oppo_counts[round.m_playing[i+2]][round.m_playing[i]] += 1;
+		m_oppo_counts[round.m_playing[i+3]][round.m_playing[i]] += 1;
+		m_oppo_counts[round.m_playing[i+2]][round.m_playing[i+1]] += 1;
+		m_oppo_counts[round.m_playing[i+3]][round.m_playing[i+1]] += 1;
+	}
+}
 void Schedule::count_oppo_counts() {		//	各プレイヤーが同じ相手と何回対戦したかを計算
 	init_oppo_counts();
+	for(const auto& round: m_rounds) {
+		update_oppo_counts(round);
+	}
 }

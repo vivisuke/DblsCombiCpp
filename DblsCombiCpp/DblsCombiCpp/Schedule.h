@@ -46,6 +46,7 @@ struct Schedule
 	void	build_first_round();
 	void	init_pair_counts();				//	
 	void	update_pair_counts(const Round&);			//	
+	void	update_oppo_counts(const Round&);			//	
 	void	count_pair_counts();			//	各プレイヤーが同じ相手と何回ペアを組んだかを計算
 	void	init_oppo_counts();
 	//double	eval_pairs(const std::vector<Pair>&);

@@ -5,7 +5,7 @@
 0003 ◎ C 06/03 06/03 0.001│ToDo│Schedule コンストラクタ等実装
 0004 ◎ C 06/03 06/03 0.001│ToDo│Schedule::print_pair_counts()
 0005 ◎ C 06/03 06/03 0.001│ToDo│Schedule::print_oppo_counts()
-0006 ● C 06/03            │ToDo│
+0006 ◎ C 06/03 06/03 0.001│問題│初期ラウンドのみのとき、oppo_counts[] が更新されていない
 0007 ● C 06/03            │ToDo│
 0008 ● C 06/03            │ToDo│
 0009 ● C 06/03            │ToDo│
