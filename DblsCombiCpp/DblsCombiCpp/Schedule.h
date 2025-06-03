@@ -53,5 +53,7 @@ struct Schedule
 	//void	update_oppo_counts(const std::vector<Pair>&);			//	
 	//void	undo_oppo_counts(const std::vector<Pair>&);			//	
 	void	count_oppo_counts();				//	各プレイヤーが同じ相手と何回対戦したかを計算
+	void	calc_pair_counts_ave_std(double&, double&) const;
+	void	calc_oppo_counts_ave_std(double&, double&) const;
 };
 

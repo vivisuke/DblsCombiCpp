@@ -54,10 +54,13 @@ void Schedule::print_pair_counts() const {
 		}
 		cout << endl;
 	}
+	double ave, std;
+	calc_pair_counts_ave_std(ave, std);
+	printf("ave = %.3f, std = %.3f\n", ave, std);
 	cout << endl;
 }
 void Schedule::print_oppo_counts() const {
-	cout << "opponent counts:" << endl;
+	cout << "oppo counts:" << endl;
 	int pid = 0;
 	for(int p1 = 0; p1 < m_num_players; ++p1) {
 		printf("%3d: " , ++pid);
@@ -69,6 +72,9 @@ void Schedule::print_oppo_counts() const {
 		}
 		cout << endl;
 	}
+	double ave, std;
+	calc_oppo_counts_ave_std(ave, std);
+	printf("ave = %.3f, std = %.3f\n", ave, std);
 	cout << endl;
 }
 void Schedule::build_first_round() {
@@ -119,4 +125,34 @@ void Schedule::count_oppo_counts() {		//	ŠeƒvƒŒƒCƒ„[‚ª“¯‚¶‘ŠŽè‚Æ‰½‰ñ‘Îí‚µ‚½‚©‚
 	for(const auto& round: m_rounds) {
 		update_oppo_counts(round);
 	}
+}
+void Schedule::calc_pair_counts_ave_std(double& ave, double& std) const {
+	int sum = 0;
+	int sum2 = 0;
+	for(int i = 0; i != m_num_players; ++i) {
+		for(int k = 0; k != m_num_players; ++k) {
+			if( k != i ) {
+				sum += m_pair_counts[i][k];
+				sum2 += m_pair_counts[i][k] * m_pair_counts[i][k];
+			}
+		}
+	}
+	int n = (m_num_players - 1) * m_num_players;
+	ave = (double)sum / n;
+	std = sqrt((double)sum2/n - ave*ave);
+}
+void Schedule::calc_oppo_counts_ave_std(double& ave, double& std) const {
+	int sum = 0;
+	int sum2 = 0;
+	for(int i = 0; i != m_num_players; ++i) {
+		for(int k = 0; k != m_num_players; ++k) {
+			if( k != i ) {
+				sum += m_oppo_counts[i][k];
+				sum2 += m_oppo_counts[i][k] * m_oppo_counts[i][k];
+			}
+		}
+	}
+	int n = (m_num_players - 1) * m_num_players;
+	ave = (double)sum / n;
+	std = sqrt((double)sum2/n - ave*ave);
 }
