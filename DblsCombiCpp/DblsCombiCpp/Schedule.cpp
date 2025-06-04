@@ -4,6 +4,9 @@
 
 using namespace std;
 
+const double W1 = 100.0;
+const double W2 = 1.0;
+
 std::mt19937 rgen(std::random_device{}()); // シードを設定
 //std::mt19937 rgen(0); // シードを設定
 
@@ -177,13 +180,25 @@ void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {
 		}
 	}
 }
+bool Schedule::search_balanced_pairs(vector<PlayerId>& plist, int pcnt, int ix) {		//	pcnt: ペア回数上限
+	if (ix >= plist.size())  return true;
+	auto p1 = plist[ix];
+	for (int ix2 = ix + 1; ix2 < plist.size(); ++ix2) {
+		if (m_pair_counts[p1][plist[ix2]] < pcnt) {		//	ペア回数が上限以下の場合
+			if (ix2 != ix + 1) swap(plist[ix + 1], plist[ix2]);
+			if (search_balanced_pairs(plist, pcnt, ix + 2))
+				return true;
+			if (ix2 != ix + 1) swap(plist[ix + 1], plist[ix2]);
+		}
+	}
+	return false;
+}
 //	ペア・対戦相手をランダムに決める
 void Schedule::add_random_round() {
 	m_resting_pid -= m_num_resting;
 	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
 	m_rounds.resize(m_rounds.size() + 1);
 	auto& round = m_rounds.back();
-	//vector<PlayerId> lst;
 	make_not_resting_players_list(round.m_playing);
 	shuffle(round.m_playing.begin(), round.m_playing.end(), rgen);
 	round.m_resting.clear();
@@ -192,3 +207,30 @@ void Schedule::add_random_round() {
 	update_pair_counts(round);
 	update_oppo_counts(round);
 }
+//	ペアはバランスさせ、対戦相手はランダムに決める
+void Schedule::add_balanced_pair_round() {
+	m_resting_pid -= m_num_resting;
+	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
+	m_rounds.resize(m_rounds.size() + 1);
+	auto& round = m_rounds.back();
+	make_not_resting_players_list(round.m_playing);
+	shuffle(round.m_playing.begin(), round.m_playing.end(), rgen);
+	auto& plist = round.m_playing;
+	for(int pcnt = 1; ;++pcnt) {
+		if( search_balanced_pairs(plist, pcnt, 0) )	//	組んでいないペアを見つける、結果は plist に反映
+			break;
+	}
+	round.m_resting.clear();
+	for(int i = 0; i < m_num_resting; ++i)
+		round.m_resting.push_back((m_resting_pid + i) % m_num_players);
+	update_pair_counts(round);
+	update_oppo_counts(round);
+}
+double Schedule::eval_balance_score() {
+	double ave1, std1;
+	double ave2, std2;
+	calc_pair_counts_ave_std(ave1, std1);
+	calc_oppo_counts_ave_std(ave2, std2);
+	return W1 * std1 + W2 * std2;
+}
+

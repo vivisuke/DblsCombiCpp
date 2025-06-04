@@ -44,6 +44,7 @@ struct Schedule
 	void	print_pair_counts() const;
 	void	print_oppo_counts() const;
 	void	make_not_resting_players_list(std::vector<PlayerId>&);		//	非休憩プレイヤーリスト取得
+	bool	search_balanced_pairs(std::vector<PlayerId>&, int, int);		//	なるべく重複しないペアを求める
 	void	build_first_round();
 	void	init_pair_counts();				//	
 	void	update_pair_counts(const Round&);			//	
@@ -57,6 +58,9 @@ struct Schedule
 	void	calc_pair_counts_ave_std(double&, double&) const;
 	void	calc_oppo_counts_ave_std(double&, double&) const;
 
+	double	eval_balance_score();			//	目的関数、0 ならば偏り無し
 	void	add_random_round();
+	void	add_balanced_pair_round();
+	void	add_balanced_oppo_round();
 };
 
