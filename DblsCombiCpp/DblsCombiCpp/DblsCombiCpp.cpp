@@ -24,5 +24,7 @@ int main()
 	sch.print_pair_counts();
 	sch.print_oppo_counts();
 
+	cout << sch.to_HTML() << endl;
+
     std::cout << "\nOK.\n";
 }

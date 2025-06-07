@@ -13,9 +13,9 @@
 0011 ◎ C 06/04 06/05 0.001│ToDo│Schedule::calc_balance_score()
 0012 ◎ C 06/07 06/07 0.001│ToDo│Schedule::gen_permutation()
 0013 ◎ C 06/07 06/07 0.001│ToDo│Schedule::shuffle_corts()：コート単位でシャフル
-0014 ● C 06/07            │ToDo│
-0015 ● C 06/07            │ToDo│
-0016 ● C 06/07            │ToDo│
+0014 ● C 06/07            │ToDo│pair_counts + oppo_counts についても標準偏差を計算し、目的関数に加える（重みは最小）
+0015 ◎ C 06/07 06/07 0.001│ToDo│table を使用した HTML 出力
+0016 ● C 06/07            │ToDo│table を使用した HTML ファイル出力
 0017 ● C 06/07            │ToDo│
 0018 ● C 06/07            │ToDo│
 0019 ● C 06/07            │ToDo│

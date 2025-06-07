@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <vector>
 
@@ -7,59 +7,60 @@
 //using PlayerId = unsigned char;
 using uchar = unsigned char;
 using ushort = unsigned short;
-using PlayerId = short;						//	0ƒIƒŠƒWƒ“
+using PlayerId = short;						//	0ã‚ªãƒªã‚¸ãƒ³
 
-//	Šeƒ‰ƒEƒ“ƒh‚Å‚Ì‡‘g‚İ‡‚í‚¹
+//	å„ãƒ©ã‚¦ãƒ³ãƒ‰ã§ã®è©¦åˆçµ„ã¿åˆã‚ã›
 struct Round {
-	std::vector<PlayerId>	m_playing;		//	”ñ‹xŒe’†ƒvƒŒƒCƒ„[ƒŠƒXƒg
-	std::vector<PlayerId>	m_resting;		//	‹xŒe’†ƒvƒŒƒCƒ„[ƒŠƒXƒg
+	std::vector<PlayerId>	m_playing;		//	éä¼‘æ†©ä¸­ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆ
+	std::vector<PlayerId>	m_resting;		//	ä¼‘æ†©ä¸­ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆ
 public:
 	void	print() const;
 	void	build_first_round(int num_courts, int num_players);
 };
-//	  ‘Sƒ‰ƒEƒ“ƒh(Round)‚ÌƒŠƒXƒgE‘g‡‚¹î•ñ
+//	  å…¨ãƒ©ã‚¦ãƒ³ãƒ‰(Round)ã®ãƒªã‚¹ãƒˆãƒ»çµ„åˆã›æƒ…å ±
 struct Schedule
 {
 public:
 	int		m_count;
 	int		m_num_players;
 	int		m_num_courts;
-	int		m_num_resting;			//	‚Pƒ‰ƒEƒ“ƒh‚Å‹xŒe‚·‚éƒvƒŒƒCƒ„[l”
+	int		m_num_resting;			//	ï¼‘ãƒ©ã‚¦ãƒ³ãƒ‰ã§ä¼‘æ†©ã™ã‚‹ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼äººæ•°
 	double	m_minev;
-	std::vector<PlayerId> m_bestlst;	//	Å—Ç‘g‚İ‡‚í‚¹
-	double	m_ave_oppo;				//	 •½‹Ï‘Îí‰ñ” i2*NRnd*(1-rest/n_players)/(n_players-1)j
-	PlayerId	m_resting_pid;		//	‹xŒe’†ƒvƒŒƒCƒ„[iÅ¬idj
-	bool	m_rest_desc;			//	‹xŒeF~‡
-	std::vector<Round>		m_rounds;	// Šeƒ‰ƒEƒ“ƒh”z—ñ
-	//std::vector<PlayerId>	m_plist;	//	ƒyƒAiix, ix+1j”z—ñ
-	std::vector<std::vector<ushort>>	m_pair_counts;		//	“¯‚¶‘Šè‚Æ‰½‰ñƒyƒA‚ğ‘g‚ñ‚¾‚©
-	std::vector<std::vector<ushort>>	m_oppo_counts;		//	“¯‚¶‘Šè‚Æ‰½‰ñ‘Îí‚µ‚½‚©
+	std::vector<PlayerId> m_bestlst;	//	æœ€è‰¯çµ„ã¿åˆã‚ã›
+	double	m_ave_oppo;				//	 å¹³å‡å¯¾æˆ¦å›æ•° ï¼ˆ2*NRnd*(1-rest/n_players)/(n_players-1)ï¼‰
+	PlayerId	m_resting_pid;		//	ä¼‘æ†©ä¸­ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ˆæœ€å°idï¼‰
+	bool	m_rest_desc;			//	ä¼‘æ†©ï¼šé™é †
+	std::vector<Round>		m_rounds;	// å„ãƒ©ã‚¦ãƒ³ãƒ‰é…åˆ—
+	//std::vector<PlayerId>	m_plist;	//	ãƒšã‚¢ï¼ˆix, ix+1ï¼‰é…åˆ—
+	std::vector<std::vector<ushort>>	m_pair_counts;		//	åŒã˜ç›¸æ‰‹ã¨ä½•å›ãƒšã‚¢ã‚’çµ„ã‚“ã ã‹
+	std::vector<std::vector<ushort>>	m_oppo_counts;		//	åŒã˜ç›¸æ‰‹ã¨ä½•å›å¯¾æˆ¦ã—ãŸã‹
 public:
 	Schedule(int num_courts, int num_players, bool rest_desc=true) {
 		m_num_players = num_players;
 		m_num_courts = num_courts;
-		m_num_resting = num_players - num_courts * 4;	//	‹xŒel”
-		m_resting_pid = num_courts * 4;			//	‹xŒe’†ƒvƒŒƒCƒ„[iÅ¬idj
+		m_num_resting = num_players - num_courts * 4;	//	ä¼‘æ†©äººæ•°
+		m_resting_pid = num_courts * 4;			//	ä¼‘æ†©ä¸­ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ï¼ˆæœ€å°idï¼‰
 		m_rest_desc = rest_desc;
 		build_first_round();
 		count_pair_counts();
 		count_oppo_counts();
 	}
 	void	print() const;
+	std::string	to_HTML() const;
 	void	print_pair_counts() const;
 	void	print_oppo_counts() const;
-	void	make_not_resting_players_list(std::vector<PlayerId>&);		//	”ñ‹xŒeƒvƒŒƒCƒ„[ƒŠƒXƒgæ“¾
-	bool	search_balanced_pairs(std::vector<PlayerId>&, int, int);		//	‚È‚é‚×‚­d•¡‚µ‚È‚¢ƒyƒA‚ğ‹‚ß‚é
+	void	make_not_resting_players_list(std::vector<PlayerId>&);		//	éä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆå–å¾—
+	bool	search_balanced_pairs(std::vector<PlayerId>&, int, int);		//	ãªã‚‹ã¹ãé‡è¤‡ã—ãªã„ãƒšã‚¢ã‚’æ±‚ã‚ã‚‹
 	void	build_first_round();
 	void	init_pair_counts();				//	
 	void	update_pair_counts(const Round&);			//	
 	void	update_oppo_counts(const Round&);			//	
-	void	count_pair_counts();			//	ŠeƒvƒŒƒCƒ„[‚ª“¯‚¶‘Šè‚Æ‰½‰ñƒyƒA‚ğ‘g‚ñ‚¾‚©‚ğŒvZ
+	void	count_pair_counts();			//	å„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒåŒã˜ç›¸æ‰‹ã¨ä½•å›ãƒšã‚¢ã‚’çµ„ã‚“ã ã‹ã‚’è¨ˆç®—
 	void	init_oppo_counts();
 	//double	eval_pairs(const std::vector<Pair>&);
 	void	update_oppo_counts(const std::vector<PlayerId>&);			//	
 	void	undo_oppo_counts(const std::vector<PlayerId>&);			//	
-	void	count_oppo_counts();				//	ŠeƒvƒŒƒCƒ„[‚ª“¯‚¶‘Šè‚Æ‰½‰ñ‘Îí‚µ‚½‚©‚ğŒvZ
+	void	count_oppo_counts();				//	å„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒåŒã˜ç›¸æ‰‹ã¨ä½•å›å¯¾æˆ¦ã—ãŸã‹ã‚’è¨ˆç®—
 	void	calc_pair_counts_ave_std(double&, double&) const;
 	void	calc_oppo_counts_ave_std(double&, double&) const;
 	double	calc_oppo_counts_std() const {
@@ -68,9 +69,9 @@ public:
 		return std;
 	}
 
-	void	shuffle_corts(std::vector<PlayerId>&);		//	ƒR[ƒg’PˆÊ‚ÅƒVƒƒƒtƒ‹
-	void	gen_permutation(std::vector<PlayerId>&, int);		//	Ä‹A“I‚É‡—ñ¶¬
-	double	eval_balance_score();			//	–Ú“IŠÖ”A0 ‚È‚ç‚Î•Î‚è–³‚µ
+	void	shuffle_corts(std::vector<PlayerId>&);		//	ã‚³ãƒ¼ãƒˆå˜ä½ã§ã‚·ãƒ£ãƒ•ãƒ«
+	void	gen_permutation(std::vector<PlayerId>&, int);		//	å†å¸°çš„ã«é †åˆ—ç”Ÿæˆ
+	double	eval_balance_score();			//	ç›®çš„é–¢æ•°ã€0 ãªã‚‰ã°åã‚Šç„¡ã—
 	bool	is_legal(const std::vector<PlayerId>&);
 	bool	is_pair_balanced(const std::vector<PlayerId>&);
 	bool	is_normalized(const std::vector<PlayerId>&);

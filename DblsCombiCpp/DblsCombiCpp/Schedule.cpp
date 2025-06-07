@@ -1,4 +1,5 @@
-#include <iostream>
+ï»¿#include <iostream>
+#include <string>
 #include <random>
 #include <algorithm>
 #include <numeric>
@@ -10,8 +11,8 @@ using namespace std;
 const double W1 = 100.0;
 const double W2 = 1.0;
 
-std::mt19937 rgen(std::random_device{}()); // ƒV[ƒh‚ğİ’è
-//std::mt19937 rgen(0); // ƒV[ƒh‚ğİ’è
+std::mt19937 rgen(std::random_device{}()); // ã‚·ãƒ¼ãƒ‰ã‚’è¨­å®š
+//std::mt19937 rgen(0); // ã‚·ãƒ¼ãƒ‰ã‚’è¨­å®š
 
 //----------------------------------------------------------------------
 void Round::print() const {
@@ -43,6 +44,55 @@ void Round::build_first_round(int num_courts, int num_players) {
 	}
 }
 //----------------------------------------------------------------------
+std::string Schedule::to_HTML() const {
+	string html = "<!DOCTYPE html>\n";
+	html += "<html lang=\"ja\">";
+	html += "<head>\n";
+	html += "\t<meta charset=\"UTF-8\">\n";
+	html += "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
+	html += "\t<title>Tennis Double Combination Table</title>";
+	html += "\t<style>\n";
+	html += "\ttable {border: 3px solid black; border-collapse: collapse;}\n";
+	html += "\ttr,th,td {border: 1px solid black; padding: 2px; text-align: center; font-size: 40px;}\n";
+	html += "\t</style>\n";
+	html += "</head>\n";
+	html += "<body>\n";
+	html += "<h3 align=center>" + to_string(m_num_courts) + "é¢ " + to_string(m_num_players) + "äºº" + "</h1>\n";
+	html += "<table width=100%>\n";
+	html += "<tr>\n";
+	for(int c = 0; c != m_num_courts; ++c) {
+		html += "\t<th>#" + to_string(c+1) + "</th>\n";
+	}
+	if( m_num_resting != 0 ) {
+		html += "\t<th>ä¼‘æ†©</th>\n";
+	}
+	html += "</tr>\n";
+	for(const auto round: m_rounds) {
+		html += "<tr>\n";
+		for(int c = 0; c < m_num_courts; ++c) {
+			int ix = c * 4;
+			html += "\t<td>" +
+						to_string(round.m_playing[ix]+1) + "," +
+						to_string(round.m_playing[ix+1]+1) + " - " +
+						to_string(round.m_playing[ix+2]+1) + "," +
+						to_string(round.m_playing[ix+3]+1) +
+					"</td>";
+		}
+		html += "\n";
+		if( m_num_resting != 0 ) {
+			html += "\t<td>";
+			for(int i = 0; i < m_num_resting; ++i) {
+				html += to_string(round.m_resting[i]+1) + " ";
+			}
+			html += "</td>\n";
+		}
+		html += "</tr>\n";
+	}
+	html += "</table>\n";
+	html += "</body>\n";
+	html += "</html>\n";
+	return html;
+}
 void Schedule::print() const {
 	int i = 0;
 	for(const auto& r: m_rounds) {
@@ -88,7 +138,7 @@ void Schedule::print_oppo_counts() const {
 	cout << endl;
 }
 void Schedule::build_first_round() {
-	if( m_num_resting < 0 ) return;		//	l”EƒR[ƒg”ƒGƒ‰[‚Ìê‡
+	if( m_num_resting < 0 ) return;		//	äººæ•°ãƒ»ã‚³ãƒ¼ãƒˆæ•°ã‚¨ãƒ©ãƒ¼ã®å ´åˆ
 	m_rounds.resize(1);
 	m_rounds[0].build_first_round(m_num_courts, m_num_players);
 }
@@ -105,7 +155,7 @@ void Schedule::update_pair_counts(const Round& round) {
 		m_pair_counts[round.m_playing[i+1]][round.m_playing[i]] += 1;
 	}
 }
-void Schedule::count_pair_counts() {		//	ŠeƒvƒŒƒCƒ„[‚ª“¯‚¶‘Šè‚Æ‰½‰ñƒyƒA‚ğ‘g‚ñ‚¾‚©‚ğŒvZ
+void Schedule::count_pair_counts() {		//	å„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒåŒã˜ç›¸æ‰‹ã¨ä½•å›ãƒšã‚¢ã‚’çµ„ã‚“ã ã‹ã‚’è¨ˆç®—
 	init_pair_counts();
 	for(const auto& round: m_rounds) {
 		update_pair_counts(round);
@@ -145,7 +195,7 @@ void Schedule::undo_oppo_counts(const std::vector<PlayerId>& plist) {
 void Schedule::update_oppo_counts(const Round& round) {
 	update_oppo_counts(round.m_playing);
 }
-void Schedule::count_oppo_counts() {		//	ŠeƒvƒŒƒCƒ„[‚ª“¯‚¶‘Šè‚Æ‰½‰ñ‘Îí‚µ‚½‚©‚ğŒvZ
+void Schedule::count_oppo_counts() {		//	å„ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒåŒã˜ç›¸æ‰‹ã¨ä½•å›å¯¾æˆ¦ã—ãŸã‹ã‚’è¨ˆç®—
 	init_oppo_counts();
 	for(const auto& round: m_rounds) {
 		update_oppo_counts(round);
@@ -182,7 +232,7 @@ void Schedule::calc_oppo_counts_ave_std(double& ave, double& std) const {
 	std = sqrt((double)sum2/n - ave*ave);
 }
 
-void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {	//	”ñ‹xŒeƒvƒŒƒCƒ„[ƒŠƒXƒg‚ğæ“¾
+void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {	//	éä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆã‚’å–å¾—
 	lst.clear();
 	for(int i = 0; i != m_num_players; ++i) {
 		int last = m_resting_pid + m_num_resting;
@@ -198,11 +248,11 @@ void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {	//	”ñ‹xŒeƒ
 		}
 	}
 }
-bool Schedule::search_balanced_pairs(vector<PlayerId>& plist, int pcnt, int ix) {		//	pcnt: ƒyƒA‰ñ”ãŒÀ
+bool Schedule::search_balanced_pairs(vector<PlayerId>& plist, int pcnt, int ix) {		//	pcnt: ãƒšã‚¢å›æ•°ä¸Šé™
 	if (ix >= plist.size())  return true;
 	auto p1 = plist[ix];
 	for (int ix2 = ix + 1; ix2 < plist.size(); ++ix2) {
-		if (m_pair_counts[p1][plist[ix2]] < pcnt) {		//	ƒyƒA‰ñ”‚ªãŒÀˆÈ‰º‚Ìê‡
+		if (m_pair_counts[p1][plist[ix2]] < pcnt) {		//	ãƒšã‚¢å›æ•°ãŒä¸Šé™ä»¥ä¸‹ã®å ´åˆ
 			if (ix2 != ix + 1) swap(plist[ix + 1], plist[ix2]);
 			if (search_balanced_pairs(plist, pcnt, ix + 2))
 				return true;
@@ -211,13 +261,13 @@ bool Schedule::search_balanced_pairs(vector<PlayerId>& plist, int pcnt, int ix) 
 	}
 	return false;
 }
-//	ƒyƒAE‘Îí‘Šè‚ğƒ‰ƒ“ƒ_ƒ€‚ÉŒˆ‚ß‚é
+//	ãƒšã‚¢ãƒ»å¯¾æˆ¦ç›¸æ‰‹ã‚’ãƒ©ãƒ³ãƒ€ãƒ ã«æ±ºã‚ã‚‹
 void Schedule::add_random_round() {
 	m_resting_pid -= m_num_resting;
 	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
 	m_rounds.resize(m_rounds.size() + 1);
 	auto& round = m_rounds.back();
-	make_not_resting_players_list(round.m_playing);	//	”ñ‹xŒeƒvƒŒƒCƒ„[ƒŠƒXƒg‚ğæ“¾
+	make_not_resting_players_list(round.m_playing);	//	éä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆã‚’å–å¾—
 	shuffle(round.m_playing.begin(), round.m_playing.end(), rgen);
 	round.m_resting.clear();
 	for(int i = 0; i < m_num_resting; ++i)
@@ -225,7 +275,7 @@ void Schedule::add_random_round() {
 	update_pair_counts(round);
 	update_oppo_counts(round);
 }
-//	ƒyƒA‚Íƒoƒ‰ƒ“ƒX‚³‚¹A‘Îí‘Šè‚Íƒ‰ƒ“ƒ_ƒ€‚ÉŒˆ‚ß‚é
+//	ãƒšã‚¢ã¯ãƒãƒ©ãƒ³ã‚¹ã•ã›ã€å¯¾æˆ¦ç›¸æ‰‹ã¯ãƒ©ãƒ³ãƒ€ãƒ ã«æ±ºã‚ã‚‹
 void Schedule::add_balanced_pair_round() {
 	m_resting_pid -= m_num_resting;
 	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
@@ -235,7 +285,7 @@ void Schedule::add_balanced_pair_round() {
 	make_not_resting_players_list(plist);
 	shuffle(plist.begin(), plist.end(), rgen);
 	for(int pcnt = 1; ;++pcnt) {
-		if( search_balanced_pairs(plist, pcnt, 0) )	//	‘g‚ñ‚Å‚¢‚È‚¢ƒyƒA‚ğŒ©‚Â‚¯‚éAŒ‹‰Ê‚Í plist ‚É”½‰f
+		if( search_balanced_pairs(plist, pcnt, 0) )	//	çµ„ã‚“ã§ã„ãªã„ãƒšã‚¢ã‚’è¦‹ã¤ã‘ã‚‹ã€çµæœã¯ plist ã«åæ˜ 
 			break;
 	}
 	round.m_resting.clear();
@@ -252,37 +302,37 @@ double Schedule::eval_balance_score() {
 	return W1 * std1 + W2 * std2;
 }
 bool Schedule::is_legal(const std::vector<PlayerId>& plist) {
-	assert( !plist.empty() );			//	plist ‚Í”ñ‹ó
-	assert( plist.size() % 4 == 0 );	//	plist.size() ‚Í‚S‚Ì”{”
+	assert( !plist.empty() );			//	plist ã¯éç©º
+	assert( plist.size() % 4 == 0 );	//	plist.size() ã¯ï¼”ã®å€æ•°
 	for(int i = 0; i < plist.size(); i+=2) {
-		if( m_pair_counts[plist[i]][plist[i+1]] > 0 ) return false;		//	“¯ˆêƒyƒA‚Í•s‰Â
-		if( plist[i] >= plist[i+1] ) return false;		//	ƒyƒA‚Í¸‡
+		if( m_pair_counts[plist[i]][plist[i+1]] > 0 ) return false;		//	åŒä¸€ãƒšã‚¢ã¯ä¸å¯
+		if( plist[i] >= plist[i+1] ) return false;		//	ãƒšã‚¢ã¯æ˜‡é †
 	}
 	for(int i = 0; i < plist.size(); i+=4) {
-		if( plist[i] >= plist[i+2] ) return false;		//	ƒyƒAÅ¬IDƒvƒŒƒCƒ„[‚à¸‡
+		if( plist[i] >= plist[i+2] ) return false;		//	ãƒšã‚¢æœ€å°IDãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚æ˜‡é †
 	}
 	for(int i = 0; i < plist.size()-4; i+=4) {
-		if( plist[i] >= plist[i+4] ) return false;		//	ŠeƒR[ƒgÅ¬IDƒvƒŒƒCƒ„[‚à¸‡
+		if( plist[i] >= plist[i+4] ) return false;		//	å„ã‚³ãƒ¼ãƒˆæœ€å°IDãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚æ˜‡é †
 	}
 	return true;
 }
 bool Schedule::is_pair_balanced(const std::vector<PlayerId>& plist) {
 	for(int i = 0; i < plist.size(); i+=2) {
-		if( m_pair_counts[plist[i]][plist[i+1]] > 0 ) return false;		//	“¯ˆêƒyƒA‚Í•s‰Â
+		if( m_pair_counts[plist[i]][plist[i+1]] > 0 ) return false;		//	åŒä¸€ãƒšã‚¢ã¯ä¸å¯
 	}
 	return true;
 }
 bool Schedule::is_normalized(const std::vector<PlayerId>& plist) {
-	assert( !plist.empty() );			//	plist ‚Í”ñ‹ó
-	assert( plist.size() % 4 == 0 );	//	plist.size() ‚Í‚S‚Ì”{”
+	assert( !plist.empty() );			//	plist ã¯éç©º
+	assert( plist.size() % 4 == 0 );	//	plist.size() ã¯ï¼”ã®å€æ•°
 	for(int i = 0; i < plist.size(); i+=2) {
-		if( plist[i] >= plist[i+1] ) return false;		//	ƒyƒA‚Í¸‡
+		if( plist[i] >= plist[i+1] ) return false;		//	ãƒšã‚¢ã¯æ˜‡é †
 	}
 	for(int i = 0; i < plist.size(); i+=4) {
-		if( plist[i] >= plist[i+2] ) return false;		//	ƒyƒAÅ¬IDƒvƒŒƒCƒ„[‚à¸‡
+		if( plist[i] >= plist[i+2] ) return false;		//	ãƒšã‚¢æœ€å°IDãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚æ˜‡é †
 	}
 	for(int i = 0; i < plist.size()-4; i+=4) {
-		if( plist[i] >= plist[i+4] ) return false;		//	ŠeƒR[ƒgÅ¬IDƒvƒŒƒCƒ„[‚à¸‡
+		if( plist[i] >= plist[i+4] ) return false;		//	å„ã‚³ãƒ¼ãƒˆæœ€å°IDãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚‚æ˜‡é †
 	}
 	return true;
 }
@@ -302,7 +352,7 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 	}
 	for(int dst = ix; dst < plist.size(); ++dst) {
 		swap(plist[ix], plist[dst]);
-		//	plist[0] ` plist[ix] ‚ªŠm’è
+		//	plist[0] ï½ plist[ix] ãŒç¢ºå®š
 		if( ((ix&1) != 1 || plist[ix-1] < plist[ix]) &&
 			((ix&3)!=2 || plist[ix-2] < plist[ix]) &&
 			(ix == 0 || (ix&3)!=0 || plist[ix-4] < plist[ix]) )
@@ -312,7 +362,7 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 		swap(plist[ix], plist[dst]);
 	}
 }
-void Schedule::shuffle_corts(vector<PlayerId>& plist) {		//	ƒR[ƒg’PˆÊ‚ÅƒVƒƒƒtƒ‹
+void Schedule::shuffle_corts(vector<PlayerId>& plist) {		//	ã‚³ãƒ¼ãƒˆå˜ä½ã§ã‚·ãƒ£ãƒ•ãƒ«
 	vector<int> ixlst(m_num_courts);
 	iota(ixlst.begin(), ixlst.end(), 0);
 	shuffle(ixlst.begin(), ixlst.end(), rgen);
@@ -326,28 +376,28 @@ void Schedule::shuffle_corts(vector<PlayerId>& plist) {		//	ƒR[ƒg’PˆÊ‚ÅƒVƒƒƒtƒ‹
 	}
 
 }
-//	ƒyƒAE‘Îí‘Šè‚ğƒoƒ‰ƒ“ƒX‚³‚¹‚½‘g‚İ‡‚í‚¹’Ç‰Á
+//	ãƒšã‚¢ãƒ»å¯¾æˆ¦ç›¸æ‰‹ã‚’ãƒãƒ©ãƒ³ã‚¹ã•ã›ãŸçµ„ã¿åˆã‚ã›è¿½åŠ 
 void Schedule::add_balanced_round() {
-	// ‹xŒeƒvƒŒƒCƒ„[ID‚ÌXV
+	// ä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼IDã®æ›´æ–°
 	m_resting_pid -= m_num_resting;
 	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
-	// V‚µ‚¢ƒ‰ƒEƒ“ƒh‚ğ’Ç‰Á
+	// æ–°ã—ã„ãƒ©ã‚¦ãƒ³ãƒ‰ã‚’è¿½åŠ 
 	//m_rounds.resize(m_rounds.size() + 1);
 	m_rounds.emplace_back();
 	auto& round = m_rounds.back();
 	auto& plist = round.m_playing;
-	// ”ñ‹xŒeƒvƒŒƒCƒ„[ƒŠƒXƒg‚Ìæ“¾‚ÆƒVƒƒƒbƒtƒ‹
-	make_not_resting_players_list(plist);	//	”ñ‹xŒeƒvƒŒƒCƒ„[ƒŠƒXƒg‚ğæ“¾
+	// éä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆã®å–å¾—ã¨ã‚·ãƒ£ãƒƒãƒ•ãƒ«
+	make_not_resting_players_list(plist);	//	éä¼‘æ†©ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆã‚’å–å¾—
 #if 1
-	m_minev = INT_MAX;		// Å¬•]‰¿’l (‚±‚±‚Å‚Í•W€•Î·)
-	//vector<PlayerId> bestlst;	// Å—Ç‚ÌƒvƒŒƒCƒ„[ƒŠƒXƒg
-	// ‘S‚Ä‚Ì‡—ñ‚ğs‚µ‚ÄÅ“K‚È‘g‚İ‡‚í‚¹‚ğŒ©‚Â‚¯‚é (‘“–‚½‚è)
+	m_minev = INT_MAX;		// æœ€å°è©•ä¾¡å€¤ (ã“ã“ã§ã¯æ¨™æº–åå·®)
+	//vector<PlayerId> bestlst;	// æœ€è‰¯ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆ
+	// å…¨ã¦ã®é †åˆ—ã‚’è©¦è¡Œã—ã¦æœ€é©ãªçµ„ã¿åˆã‚ã›ã‚’è¦‹ã¤ã‘ã‚‹ (ç·å½“ãŸã‚Š)
 	m_count = 0;
 #if 1
-	gen_permutation(plist, 0);		//	Ä‹A“I‚É‡—ñ¶¬
+	gen_permutation(plist, 0);		//	å†å¸°çš„ã«é †åˆ—ç”Ÿæˆ
 #else
 	do {
-		if( is_normalized(plist) ) {	// —LŒø‚È‘g‚İ‡‚í‚¹‚©ƒ`ƒFƒbƒN
+		if( is_normalized(plist) ) {	// æœ‰åŠ¹ãªçµ„ã¿åˆã‚ã›ã‹ãƒã‚§ãƒƒã‚¯
 			++m_count;
 			if( is_pair_balanced(plist) ) {
 #if 1
@@ -368,17 +418,17 @@ void Schedule::add_balanced_round() {
 #else
 	shuffle(plist.begin(), plist.end(), rgen);
 	//
-	auto plist0 = plist;				// ƒVƒƒƒbƒtƒ‹Œã‚ÌƒŠƒXƒg‚ğ•Û (‡—ñ¶¬‚Ìƒx[ƒX)
+	auto plist0 = plist;				// ã‚·ãƒ£ãƒƒãƒ•ãƒ«å¾Œã®ãƒªã‚¹ãƒˆã‚’ä¿æŒ (é †åˆ—ç”Ÿæˆã®ãƒ™ãƒ¼ã‚¹)
 	vector<int> ixlst(plist.size());
-	//for(int i = 0; i != ixlst.size(); ++i) ixlst[i] = i;	// 0, 1, 2, ... ‚ÌƒCƒ“ƒfƒbƒNƒXƒŠƒXƒg
+	//for(int i = 0; i != ixlst.size(); ++i) ixlst[i] = i;	// 0, 1, 2, ... ã®ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ãƒªã‚¹ãƒˆ
 	iota(ixlst.begin(), ixlst.end(), 0);
-	int minev = INT_MAX;		// Å¬•]‰¿’l (‚±‚±‚Å‚Í•W€•Î·)
-	vector<PlayerId> bestlst;	// Å—Ç‚ÌƒvƒŒƒCƒ„[ƒŠƒXƒg
-	// ‘S‚Ä‚Ì‡—ñ‚ğs‚µ‚ÄÅ“K‚È‘g‚İ‡‚í‚¹‚ğŒ©‚Â‚¯‚é (‘“–‚½‚è)
+	int minev = INT_MAX;		// æœ€å°è©•ä¾¡å€¤ (ã“ã“ã§ã¯æ¨™æº–åå·®)
+	vector<PlayerId> bestlst;	// æœ€è‰¯ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒªã‚¹ãƒˆ
+	// å…¨ã¦ã®é †åˆ—ã‚’è©¦è¡Œã—ã¦æœ€é©ãªçµ„ã¿åˆã‚ã›ã‚’è¦‹ã¤ã‘ã‚‹ (ç·å½“ãŸã‚Š)
 	do {
-		//	ixlst[] ‚Ì‡˜‚Å plist0 ‚©‚ç plist ‚ğ\’z
+		//	ixlst[] ã®é †åºã§ plist0 ã‹ã‚‰ plist ã‚’æ§‹ç¯‰
 		for(int k = 0; k != ixlst.size(); ++k) plist[k] = plist0[ixlst[k]];
-		if( is_legal(plist) ) {	// —LŒø‚È‘g‚İ‡‚í‚¹‚©ƒ`ƒFƒbƒN
+		if( is_legal(plist) ) {	// æœ‰åŠ¹ãªçµ„ã¿åˆã‚ã›ã‹ãƒã‚§ãƒƒã‚¯
 			update_oppo_counts(plist);
 			auto ev = calc_oppo_counts_std();
 			undo_oppo_counts(plist);
