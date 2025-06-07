@@ -10,7 +10,7 @@ using namespace std;
 
 const double W1 = 100.0;
 const double W2 = 1.0;
-const double W3 = 0.5;
+const double W3 = 0.4;
 
 std::mt19937 rgen(std::random_device{}()); // シードを設定
 //std::mt19937 rgen(0); // シードを設定
@@ -323,8 +323,8 @@ double Schedule::eval_balance_score() {
 	double ave2, std2;
 	calc_pair_counts_ave_std(ave1, std1);
 	calc_oppo_counts_ave_std(ave2, std2);
-	return W1 * std1 + W2 * std2;
-	//return W1 * std1 + W2 * std2 + W3 * calc_pair_oppo_counts_std();
+	//return W1 * std1 + W2 * std2;
+	return W1 * std1 + W2 * std2 + W3 * calc_pair_oppo_counts_std();
 }
 bool Schedule::is_legal(const std::vector<PlayerId>& plist) {
 	assert( !plist.empty() );			//	plist は非空
@@ -366,7 +366,8 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 		++m_count;
 		if( is_pair_balanced(plist) ) {
 			update_oppo_counts(plist);
-			auto ev = calc_oppo_counts_std();
+			//auto ev = calc_oppo_counts_std();
+			auto ev = eval_balance_score();
 			undo_oppo_counts(plist);
 			if( ev < m_minev ) {
 				m_minev = ev;
