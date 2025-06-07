@@ -10,6 +10,7 @@ using namespace std;
 
 const double W1 = 100.0;
 const double W2 = 1.0;
+const double W3 = 0.5;
 
 std::mt19937 rgen(std::random_device{}()); // シードを設定
 //std::mt19937 rgen(0); // シードを設定
@@ -238,6 +239,22 @@ void Schedule::calc_oppo_counts_ave_std(double& ave, double& std) const {
 	ave = (double)sum / n;
 	std = sqrt((double)sum2/n - ave*ave);
 }
+double Schedule::calc_pair_oppo_counts_std() const {
+	int sum = 0;
+	int sum2 = 0;
+	for(int i = 0; i != m_num_players; ++i) {
+		for(int k = 0; k != m_num_players; ++k) {
+			if( k != i ) {
+				auto d = m_pair_counts[i][k] + m_oppo_counts[i][k];
+				sum += d;
+				sum2 += d * d ;
+			}
+		}
+	}
+	int n = (m_num_players - 1) * m_num_players;
+	auto ave = (double)sum / n;
+	return sqrt((double)sum2/n - ave*ave);
+}
 
 void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {	//	非休憩プレイヤーリストを取得
 	lst.clear();
@@ -307,6 +324,7 @@ double Schedule::eval_balance_score() {
 	calc_pair_counts_ave_std(ave1, std1);
 	calc_oppo_counts_ave_std(ave2, std2);
 	return W1 * std1 + W2 * std2;
+	//return W1 * std1 + W2 * std2 + W3 * calc_pair_oppo_counts_std();
 }
 bool Schedule::is_legal(const std::vector<PlayerId>& plist) {
 	assert( !plist.empty() );			//	plist は非空

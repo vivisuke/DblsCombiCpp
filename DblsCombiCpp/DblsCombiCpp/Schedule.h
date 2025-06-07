@@ -64,6 +64,8 @@ public:
 	void	count_oppo_counts();				//	各プレイヤーが同じ相手と何回対戦したかを計算
 	void	calc_pair_counts_ave_std(double&, double&) const;
 	void	calc_oppo_counts_ave_std(double&, double&) const;
+	//void	calc_pair_oppo_ave_std(double&, double&) const;			//	pair_counts + oppo_counts の平均・標準偏差
+	double	calc_pair_oppo_counts_std() const;		//	pair_counts + oppo_counts の標準偏差計算
 	double	calc_oppo_counts_std() const {
 		double ave, std;
 		calc_oppo_counts_ave_std(ave, std);
