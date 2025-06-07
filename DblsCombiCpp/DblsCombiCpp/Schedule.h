@@ -68,6 +68,7 @@ public:
 		return std;
 	}
 
+	void	shuffle_corts(std::vector<PlayerId>&);		//	コート単位でシャフル
 	void	gen_permutation(std::vector<PlayerId>&, int);		//	再帰的に順列生成
 	double	eval_balance_score();			//	目的関数、0 ならば偏り無し
 	bool	is_legal(const std::vector<PlayerId>&);

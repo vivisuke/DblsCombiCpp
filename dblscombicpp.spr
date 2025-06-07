@@ -11,8 +11,8 @@
 0009 ◎ C 06/04 06/04 0.001│ToDo│Schedule::add_balanced_pair_round()
 0010 ● C 06/04            │ToDo│Schedule::add_balanced_oppo_round()：貪欲法に基づいた逐次構築法を用いる
 0011 ◎ C 06/04 06/05 0.001│ToDo│Schedule::calc_balance_score()
-0012 ◎ C 06/07 06/07 0.001│ToDo│Schedule：gen_permutation()
-0013 ● C 06/07            │ToDo│
+0012 ◎ C 06/07 06/07 0.001│ToDo│Schedule::gen_permutation()
+0013 ◎ C 06/07 06/07 0.001│ToDo│Schedule::shuffle_corts()：コート単位でシャフル
 0014 ● C 06/07            │ToDo│
 0015 ● C 06/07            │ToDo│
 0016 ● C 06/07            │ToDo│

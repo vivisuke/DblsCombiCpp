@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-	Schedule sch(3, 13);		//	面数、プレイヤー数
+	Schedule sch(3, 14);		//	面数、プレイヤー数
 	std::chrono::system_clock::time_point  start, end; // 型は auto で可
 	start = std::chrono::system_clock::now(); // 計測開始時間
  	for (int r = 1; r < 8; ++r) {

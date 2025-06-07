@@ -312,6 +312,20 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 		swap(plist[ix], plist[dst]);
 	}
 }
+void Schedule::shuffle_corts(vector<PlayerId>& plist) {		//	コート単位でシャフル
+	vector<int> ixlst(m_num_courts);
+	iota(ixlst.begin(), ixlst.end(), 0);
+	shuffle(ixlst.begin(), ixlst.end(), rgen);
+	auto lst0 = plist;
+	for(int c = 0; c < m_num_courts; ++c) {
+		int ix4 = ixlst[c] * 4;
+		plist[c*4] = lst0[ix4];
+		plist[c*4+1] = lst0[ix4+1];
+		plist[c*4+2] = lst0[ix4+2];
+		plist[c*4+3] = lst0[ix4+3];
+	}
+
+}
 //	ペア・対戦相手をバランスさせた組み合わせ追加
 void Schedule::add_balanced_round() {
 	// 休憩プレイヤーIDの更新
@@ -376,6 +390,7 @@ void Schedule::add_balanced_round() {
 	} while( next_permutation(ixlst.begin(), ixlst.end()) );
 #endif
 	plist = m_bestlst;
+	shuffle_corts(plist);
 	round.m_resting.clear();
 	for(int i = 0; i < m_num_resting; ++i)
 		round.m_resting.push_back((m_resting_pid + i) % m_num_players);
