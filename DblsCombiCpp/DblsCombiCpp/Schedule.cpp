@@ -57,18 +57,25 @@ std::string Schedule::to_HTML() const {
 	html += "\t</style>\n";
 	html += "</head>\n";
 	html += "<body>\n";
-	html += "<h3 align=center>" + to_string(m_num_courts) + "面 " + to_string(m_num_players) + "人" + "</h1>\n";
+	double ave, std;
+	string ttl = to_string(m_num_courts) + u8"面 " + to_string(m_num_players) + u8"人";
+	auto oppo_std = calc_oppo_counts_std();
+	ttl += " (STD = " + to_string(oppo_std).substr(0, 5) + ")";
+	html += "<h1 align=center>" + ttl + "</h1>\n";
 	html += "<table width=100%>\n";
 	html += "<tr>\n";
+	html += "\t<td>R</td>\n";
 	for(int c = 0; c != m_num_courts; ++c) {
 		html += "\t<th>#" + to_string(c+1) + "</th>\n";
 	}
 	if( m_num_resting != 0 ) {
-		html += "\t<th>休憩</th>\n";
+		html += u8"\t<th>休憩</th>\n";
 	}
 	html += "</tr>\n";
+	int r = 0;
 	for(const auto round: m_rounds) {
 		html += "<tr>\n";
+		html += "\t<td>" + to_string(++r) + "</td>\n";
 		for(int c = 0; c < m_num_courts; ++c) {
 			int ix = c * 4;
 			html += "\t<td>" +

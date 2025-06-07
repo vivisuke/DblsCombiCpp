@@ -1,4 +1,6 @@
 ﻿#include <iostream>
+#include <fstream>
+#include <string>
 #include <chrono>
 #include "Schedule.h"
 
@@ -6,7 +8,9 @@ using namespace std;
 
 int main()
 {
-	Schedule sch(3, 14);		//	面数、プレイヤー数
+	const int n_courts = 3;		//	面数
+	const int n_players = 14;	//	プレイヤー数
+	Schedule sch(n_courts, n_players);		//	面数、プレイヤー数
 	std::chrono::system_clock::time_point  start, end; // 型は auto で可
 	start = std::chrono::system_clock::now(); // 計測開始時間
  	for (int r = 1; r < 8; ++r) {
@@ -24,7 +28,11 @@ int main()
 	sch.print_pair_counts();
 	sch.print_oppo_counts();
 
-	cout << sch.to_HTML() << endl;
+	//cout << sch.to_HTML() << endl;
+	string filename = "table_" + to_string(n_courts) + "c" + to_string(n_players) + "p.html";
+	std::ofstream ofs(filename);
+	ofs << sch.to_HTML();
+	ofs.close();
 
     std::cout << "\nOK.\n";
 }

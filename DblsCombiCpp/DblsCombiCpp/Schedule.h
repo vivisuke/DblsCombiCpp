@@ -25,6 +25,7 @@ public:
 	int		m_num_players;
 	int		m_num_courts;
 	int		m_num_resting;			//	１ラウンドで休憩するプレイヤー人数
+	double	m_std;
 	double	m_minev;
 	std::vector<PlayerId> m_bestlst;	//	最良組み合わせ
 	double	m_ave_oppo;				//	 平均対戦回数 （2*NRnd*(1-rest/n_players)/(n_players-1)）
