@@ -20,9 +20,13 @@ public:
 //	  全ラウンド(Round)のリスト・組合せ情報
 struct Schedule
 {
+public:
+	int		m_count;
 	int		m_num_players;
 	int		m_num_courts;
 	int		m_num_resting;			//	１ラウンドで休憩するプレイヤー人数
+	double	m_minev;
+	std::vector<PlayerId> m_bestlst;	//	最良組み合わせ
 	double	m_ave_oppo;				//	 平均対戦回数 （2*NRnd*(1-rest/n_players)/(n_players-1)）
 	PlayerId	m_resting_pid;		//	休憩中プレイヤー（最小id）
 	bool	m_rest_desc;			//	休憩：降順
@@ -30,6 +34,7 @@ struct Schedule
 	//std::vector<PlayerId>	m_plist;	//	ペア（ix, ix+1）配列
 	std::vector<std::vector<ushort>>	m_pair_counts;		//	同じ相手と何回ペアを組んだか
 	std::vector<std::vector<ushort>>	m_oppo_counts;		//	同じ相手と何回対戦したか
+public:
 	Schedule(int num_courts, int num_players, bool rest_desc=true) {
 		m_num_players = num_players;
 		m_num_courts = num_courts;
@@ -52,15 +57,24 @@ struct Schedule
 	void	count_pair_counts();			//	各プレイヤーが同じ相手と何回ペアを組んだかを計算
 	void	init_oppo_counts();
 	//double	eval_pairs(const std::vector<Pair>&);
-	//void	update_oppo_counts(const std::vector<Pair>&);			//	
-	//void	undo_oppo_counts(const std::vector<Pair>&);			//	
+	void	update_oppo_counts(const std::vector<PlayerId>&);			//	
+	void	undo_oppo_counts(const std::vector<PlayerId>&);			//	
 	void	count_oppo_counts();				//	各プレイヤーが同じ相手と何回対戦したかを計算
 	void	calc_pair_counts_ave_std(double&, double&) const;
 	void	calc_oppo_counts_ave_std(double&, double&) const;
+	double	calc_oppo_counts_std() const {
+		double ave, std;
+		calc_oppo_counts_ave_std(ave, std);
+		return std;
+	}
 
+	void	gen_permutation(std::vector<PlayerId>&, int);		//	再帰的に順列生成
 	double	eval_balance_score();			//	目的関数、0 ならば偏り無し
+	bool	is_legal(const std::vector<PlayerId>&);
+	bool	is_pair_balanced(const std::vector<PlayerId>&);
+	bool	is_normalized(const std::vector<PlayerId>&);
 	void	add_random_round();
 	void	add_balanced_pair_round();
-	void	add_balanced_oppo_round();
+	void	add_balanced_round();
 };
 
