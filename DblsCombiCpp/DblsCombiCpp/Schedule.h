@@ -28,6 +28,7 @@ public:
 	double	m_std;
 	double	m_minev;
 	std::vector<PlayerId> m_bestlst;	//	最良組み合わせ
+	std::vector<std::vector<PlayerId>> m_bestlstlst;
 	double	m_ave_oppo;				//	 平均対戦回数 （2*NRnd*(1-rest/n_players)/(n_players-1)）
 	PlayerId	m_resting_pid;		//	休憩中プレイヤー（最小id）
 	bool	m_rest_desc;			//	休憩：降順

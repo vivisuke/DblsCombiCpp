@@ -58,10 +58,12 @@ std::string Schedule::to_HTML() const {
 	html += "\t</style>\n";
 	html += "</head>\n";
 	html += "<body>\n";
-	double ave, std;
 	string ttl = to_string(m_num_courts) + u8"面 " + to_string(m_num_players) + u8"人";
 	auto oppo_std = calc_oppo_counts_std();
-	ttl += " (STD = " + to_string(oppo_std).substr(0, 5) + ")";
+	//ttl += " (STD = " + to_string(oppo_std).substr(0, 5) + ")";
+	char buf[8];
+	sprintf_s(buf, "%.3f", oppo_std);
+	ttl += " (STD = " + string(buf) + ")";
 	html += "<h1 align=center>" + ttl + "</h1>\n";
 	html += "<table width=100%>\n";
 	html += "<tr>\n";
@@ -80,9 +82,9 @@ std::string Schedule::to_HTML() const {
 		for(int c = 0; c < m_num_courts; ++c) {
 			int ix = c * 4;
 			html += "\t<td>" +
-						to_string(round.m_playing[ix]+1) + "," +
+						to_string(round.m_playing[ix]+1) + ", " +
 						to_string(round.m_playing[ix+1]+1) + " - " +
-						to_string(round.m_playing[ix+2]+1) + "," +
+						to_string(round.m_playing[ix+2]+1) + ", " +
 						to_string(round.m_playing[ix+3]+1) +
 					"</td>";
 		}
@@ -372,6 +374,10 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 			if( ev < m_minev ) {
 				m_minev = ev;
 				m_bestlst = plist;
+				m_bestlstlst.clear();
+				m_bestlstlst.push_back(plist);
+			} else if( ev == m_minev ) {
+				m_bestlstlst.push_back(plist);
 			}
 		}
 		return;
@@ -416,11 +422,12 @@ void Schedule::add_balanced_round() {
 	make_not_resting_players_list(plist);	//	非休憩プレイヤーリストを取得
 #if 1
 	m_minev = INT_MAX;		// 最小評価値 (ここでは標準偏差)
+	m_bestlstlst.clear();
 	//vector<PlayerId> bestlst;	// 最良のプレイヤーリスト
 	// 全ての順列を試行して最適な組み合わせを見つける (総当たり)
 	m_count = 0;
 #if 1
-	gen_permutation(plist, 0);		//	再帰的に順列生成
+	gen_permutation(plist, 1);		//	再帰的に順列生成, 1 for 最初は最小番号固定
 #else
 	do {
 		if( is_normalized(plist) ) {	// 有効な組み合わせかチェック
@@ -465,7 +472,10 @@ void Schedule::add_balanced_round() {
 		}
 	} while( next_permutation(ixlst.begin(), ixlst.end()) );
 #endif
-	plist = m_bestlst;
+	if( m_bestlstlst.size() > 1 ) {
+		plist = m_bestlstlst[rgen() % m_bestlstlst.size()];
+	} else
+		plist = m_bestlst;
 	shuffle_corts(plist);
 	round.m_resting.clear();
 	for(int i = 0; i < m_num_resting; ++i)
