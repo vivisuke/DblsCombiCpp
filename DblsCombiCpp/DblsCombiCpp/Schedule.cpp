@@ -364,6 +364,32 @@ bool Schedule::is_normalized(const std::vector<PlayerId>& plist) {
 	return true;
 }
 void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
+	if( ix == plist.size() - 2 ) {		//	残り２要素
+		if( plist[ix] > plist[ix+1] )
+			swap(plist[ix], plist[ix+1]);
+		if( plist[ix-4] < plist[ix] ) {
+			++m_count;
+			if( is_pair_balanced(plist) ) {
+				update_oppo_counts(plist);
+				//auto ev = calc_oppo_counts_std();
+				auto ev = eval_balance_score();
+				undo_oppo_counts(plist);
+				if( ev < m_minev ) {
+					m_minev = ev;
+					m_bestlst = plist;
+					m_bestlstlst.clear();
+					m_bestlstlst.push_back(plist);
+				} else if( ev == m_minev ) {
+					for(int i = 0; i < plist.size(); i+=2) {
+						assert( plist[i] < plist[i+1] );
+					}
+					m_bestlstlst.push_back(plist);
+				}
+			}
+		}
+		return;
+	}
+#if 0
 	if( ix == plist.size() - 1 ) {
 		if( plist[ix-1] < plist[ix] ) {
 			for (int i = 0; i < plist.size(); i += 2) {
@@ -390,6 +416,7 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 		}
 		return;
 	}
+#endif
 	for(int dst = ix; dst < plist.size(); ++dst) {
 		swap(plist[ix], plist[dst]);
 		//	plist[0] ～ plist[ix] が確定
