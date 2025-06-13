@@ -12,7 +12,7 @@ const double W1 = 100.0;
 const double W2 = 1.0;
 const double W3 = 0.4;
 
-std::mt19937 rgen(std::random_device{}()); // シードを設定
+std::mt19937 rgen(std::random_device{}()); // ランダムシード設定
 //std::mt19937 rgen(0); // シードを設定
 
 //----------------------------------------------------------------------
@@ -365,19 +365,27 @@ bool Schedule::is_normalized(const std::vector<PlayerId>& plist) {
 }
 void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 	if( ix == plist.size() - 1 ) {
-		++m_count;
-		if( is_pair_balanced(plist) ) {
-			update_oppo_counts(plist);
-			//auto ev = calc_oppo_counts_std();
-			auto ev = eval_balance_score();
-			undo_oppo_counts(plist);
-			if( ev < m_minev ) {
-				m_minev = ev;
-				m_bestlst = plist;
-				m_bestlstlst.clear();
-				m_bestlstlst.push_back(plist);
-			} else if( ev == m_minev ) {
-				m_bestlstlst.push_back(plist);
+		if( plist[ix-1] < plist[ix] ) {
+			for (int i = 0; i < plist.size(); i += 2) {
+				assert(plist[i] < plist[i + 1]);
+			}
+			++m_count;
+			if( is_pair_balanced(plist) ) {
+				update_oppo_counts(plist);
+				//auto ev = calc_oppo_counts_std();
+				auto ev = eval_balance_score();
+				undo_oppo_counts(plist);
+				if( ev < m_minev ) {
+					m_minev = ev;
+					m_bestlst = plist;
+					m_bestlstlst.clear();
+					m_bestlstlst.push_back(plist);
+				} else if( ev == m_minev ) {
+					for(int i = 0; i < plist.size(); i+=2) {
+						assert( plist[i] < plist[i+1] );
+					}
+					m_bestlstlst.push_back(plist);
+				}
 			}
 		}
 		return;
@@ -389,6 +397,9 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 			((ix&3)!=2 || plist[ix-2] < plist[ix]) &&
 			(ix == 0 || (ix&3)!=0 || plist[ix-4] < plist[ix]) )
 		{
+			for(int i = 1; i <= ix; i+=2) {
+				assert( plist[i-1] < plist[i] );
+			}
 			gen_permutation(plist, ix+1);
 		}
 		swap(plist[ix], plist[dst]);
