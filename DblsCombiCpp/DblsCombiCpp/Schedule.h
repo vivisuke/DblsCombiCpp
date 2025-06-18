@@ -82,5 +82,6 @@ public:
 	void	add_random_round();
 	void	add_balanced_pair_round();
 	void	add_balanced_round();
+	void	add_greedy_balanced_round();
 };
 

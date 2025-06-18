@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define		is_empty()	empty()
+
 const double W1 = 100.0;
 const double W2 = 1.0;
 const double W3 = 0.4;
@@ -379,7 +381,7 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 					m_bestlst = plist;
 					m_bestlstlst.clear();
 					m_bestlstlst.push_back(plist);
-				} else if( ev == m_minev ) {
+				} else if( ev == m_minev && m_bestlstlst.size() < 100 ) {
 					for(int i = 0; i < plist.size(); i+=2) {
 						assert( plist[i] < plist[i+1] );
 					}
@@ -387,6 +389,20 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 				}
 			}
 		}
+		return;
+	}
+	if( (ix&3) == 0 ) {		//	ix が４の倍数 → 以降の最小値を plist[ix] に 
+		auto minval = plist[ix];
+		auto minix = ix;
+		for(int i = ix + 1; i < plist.size(); ++i) {
+			if( plist[i] < minval ) {
+				minval = plist[i];
+				minix = i;
+			}
+		}
+		if( minix != ix )
+			swap(plist[ix], plist[minix]);
+		gen_permutation(plist, ix+1);
 		return;
 	}
 #if 0
@@ -510,7 +526,7 @@ void Schedule::add_balanced_round() {
 		}
 	} while( next_permutation(ixlst.begin(), ixlst.end()) );
 #endif
-	if( m_bestlstlst.size() > 1 ) {
+	if( !m_bestlstlst.is_empty() ) {
 		plist = m_bestlstlst[rgen() % m_bestlstlst.size()];
 	} else
 		plist = m_bestlst;
