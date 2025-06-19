@@ -8,8 +8,8 @@ using namespace std;
 
 int main()
 {
-	const int n_courts = 4;		//	面数
-	const int n_players = 16;	//	プレイヤー数
+	const int n_courts = 3;		//	面数
+	const int n_players = 13;	//	プレイヤー数
 	Schedule sch(n_courts, n_players);		//	面数、プレイヤー数
 	std::chrono::system_clock::time_point  start, end; // 型は auto で可
 	start = std::chrono::system_clock::now(); // 計測開始時間

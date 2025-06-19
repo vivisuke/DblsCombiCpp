@@ -436,9 +436,10 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 	for(int dst = ix; dst < plist.size(); ++dst) {
 		swap(plist[ix], plist[dst]);
 		//	plist[0] ～ plist[ix] が確定
-		if( ((ix&1) != 1 || plist[ix-1] < plist[ix]) &&
-			((ix&3)!=2 || plist[ix-2] < plist[ix]) &&
-			(ix == 0 || (ix&3)!=0 || plist[ix-4] < plist[ix]) )
+		if( ((ix&1) != 1 || plist[ix-1] < plist[ix]) &&				//	ペアは昇順
+			((ix&1) != 1 || m_pair_counts[plist[ix-1]][plist[ix]] == 0) &&		//	未ペア
+			((ix&3)!=2 || plist[ix-2] < plist[ix]) /*&&				//	各ペアの最小IDが昇順
+			(ix == 0 || (ix&3)!=0 || plist[ix-4] < plist[ix])*/ )		//	各コートの最小IDが昇順
 		{
 			for(int i = 1; i <= ix; i+=2) {
 				assert( plist[i-1] < plist[i] );
