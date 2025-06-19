@@ -25,7 +25,7 @@
 0023 ◎ C 06/13 06/14 0.001│ToDo│gen_permutation()：最後の２要素の時点で、要素を昇順に
 0024 ◎ C 06/13 06/19 0.001│ToDo│gen_permutation(ix)：(ix&3)==0 の場合は、以降の最小値で確定
 0025 ◎ C 06/19 06/19 0.001│ToDo│gen_permutation(ix)：ペア回数が2以上の場合は枝狩り
-0026 ● C 06/19            │ToDo│
+0026 ◎ C 06/19 06/19 0.001│ToDo│print_oppo_counts()：ゼロ個数表示
 0027 ● C 06/19            │ToDo│
 0028 ● C 06/19            │ToDo│
 0029 ● C 06/19            │ToDo│

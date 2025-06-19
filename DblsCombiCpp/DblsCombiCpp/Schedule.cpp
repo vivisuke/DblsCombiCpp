@@ -133,20 +133,22 @@ void Schedule::print_pair_counts() const {
 }
 void Schedule::print_oppo_counts() const {
 	cout << "oppo counts:" << endl;
+	int zc = 0;
 	int pid = 0;
 	for(int p1 = 0; p1 < m_num_players; ++p1) {
 		printf("%3d: " , ++pid);
 		for(int p2 = 0; p2 < m_num_players; ++p2) {
-			if( p1 != p2 )
+			if( p1 != p2 ) {
+				if( m_oppo_counts[p1][p2] == 0 ) ++zc;
 				cout << m_oppo_counts[p1][p2] << " ";
-			else
+			} else
 				cout << "- ";
 		}
 		cout << endl;
 	}
 	double ave, std;
 	calc_oppo_counts_ave_std(ave, std);
-	printf("ave = %.3f, std = %.3f\n", ave, std);
+	printf("ave = %.3f, std = %.3f, zero = %d\n", ave, std, zc);
 	cout << endl;
 }
 void Schedule::build_first_round() {
