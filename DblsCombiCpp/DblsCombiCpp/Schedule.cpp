@@ -65,7 +65,7 @@ std::string Schedule::to_HTML() const {
 	//ttl += " (STD = " + to_string(oppo_std).substr(0, 5) + ")";
 	char buf[8];
 	sprintf_s(buf, "%.3f", oppo_std);
-	ttl += " (STD = " + string(buf) + ")";
+	ttl += " (STD = " + string(buf) + u8" 未対戦数 = " + to_string(m_n_oc_zero) + ")";
 	html += "<h1 align=center>" + ttl + "</h1>\n";
 	html += "<table width=100%>\n";
 	html += "<tr>\n";
@@ -231,13 +231,17 @@ void Schedule::calc_pair_counts_ave_std(double& ave, double& std) const {
 	std = sqrt((double)sum2/n - ave*ave);
 }
 void Schedule::calc_oppo_counts_ave_std(double& ave, double& std) const {
+	m_n_oc_zero = 0;
 	int sum = 0;
 	int sum2 = 0;
 	for(int i = 0; i != m_num_players; ++i) {
 		for(int k = 0; k != m_num_players; ++k) {
 			if( k != i ) {
-				sum += m_oppo_counts[i][k];
-				sum2 += m_oppo_counts[i][k] * m_oppo_counts[i][k];
+				if( m_oppo_counts[i][k] != 0 ) {
+					sum += m_oppo_counts[i][k];
+					sum2 += m_oppo_counts[i][k] * m_oppo_counts[i][k];
+				} else
+					++m_n_oc_zero;
 			}
 		}
 	}
@@ -369,7 +373,8 @@ bool Schedule::is_normalized(const std::vector<PlayerId>& plist) {
 }
 void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 	if( ix == plist.size() - 2 ) {		//	残り２要素
-		if( plist[ix] > plist[ix+1] )
+		const bool dec = plist[ix] > plist[ix+1];
+		if( dec )
 			swap(plist[ix], plist[ix+1]);
 		if( plist[ix-4] < plist[ix] ) {
 			++m_count;
@@ -391,6 +396,8 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 				}
 			}
 		}
+		if( dec )
+			swap(plist[ix], plist[ix+1]);
 		return;
 	}
 	if( (ix&3) == 0 ) {		//	ix が４の倍数 → 以降の最小値を plist[ix] に 
@@ -405,6 +412,8 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 		if( minix != ix )
 			swap(plist[ix], plist[minix]);
 		gen_permutation(plist, ix+1);
+		if( minix != ix )
+			swap(plist[ix], plist[minix]);
 		return;
 	}
 #if 0
@@ -540,4 +549,32 @@ void Schedule::add_balanced_round() {
 	update_pair_counts(round);
 	update_oppo_counts(round);
 }
-
+int get_number(cchar* &ptr) {
+	while( !isdigit(*ptr) ) {
+		if( *ptr == '\0' ) return -1;
+		++ptr;
+	}
+	int val = *ptr++ - '0';
+	while( isdigit(*ptr) ) {
+		val = val * 10 + *ptr++ - '0';
+	}
+	return val;
+}
+void Schedule::add_round(cchar *&ptr) {
+	int cnt = 0;
+	m_rounds.emplace_back();
+	auto& round = m_rounds.back();
+	round.m_resting.clear();
+	while( *ptr != '\0' ) {
+		auto v = get_number(ptr);
+		//cout << v << " ";
+		round.m_playing.push_back(v-1);
+		if( ++cnt % 16 == 0 ) {
+			//cout << endl;
+			break;
+		}
+	}
+	while( *ptr != '\0' && !isdigit(*ptr) ) ++ptr;
+	update_pair_counts(round);
+	update_oppo_counts(round);
+}

@@ -5,6 +5,7 @@
 //typedef unsigned char uchar;
 //typedef unsigned short ushort;
 //using PlayerId = unsigned char;
+using cchar = const char;
 using uchar = unsigned char;
 using ushort = unsigned short;
 using PlayerId = short;						//	0オリジン
@@ -35,6 +36,7 @@ public:
 	std::vector<Round>		m_rounds;	// 各ラウンド配列
 	//std::vector<PlayerId>	m_plist;	//	ペア（ix, ix+1）配列
 	std::vector<std::vector<ushort>>	m_pair_counts;		//	同じ相手と何回ペアを組んだか
+	mutable int		m_n_oc_zero;				//	非対戦回数
 	std::vector<std::vector<ushort>>	m_oppo_counts;		//	同じ相手と何回対戦したか
 public:
 	Schedule(int num_courts, int num_players, bool rest_desc=true) {
@@ -47,6 +49,7 @@ public:
 		count_pair_counts();
 		count_oppo_counts();
 	}
+	int		get_n_oc_zero() const { return m_n_oc_zero; }
 	void	print() const;
 	std::string	to_HTML() const;
 	void	print_pair_counts() const;
@@ -79,6 +82,7 @@ public:
 	bool	is_legal(const std::vector<PlayerId>&);
 	bool	is_pair_balanced(const std::vector<PlayerId>&);
 	bool	is_normalized(const std::vector<PlayerId>&);
+	void	add_round(cchar*&);
 	void	add_random_round();
 	void	add_balanced_pair_round();
 	void	add_balanced_round();
