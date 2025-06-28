@@ -282,6 +282,24 @@ void Schedule::make_not_resting_players_list(vector<PlayerId>& lst) {	//	非休�
 		}
 	}
 }
+Bitmap Schedule::make_not_resting_players_list() {	//	非休憩プレイヤーリストを取得
+	Bitmap bits = 0;
+	Bitmap b = 1;
+	for(int i = 0; i != m_num_players; ++i, b<<=1) {
+		int last = m_resting_pid + m_num_resting;
+		if( last < m_num_players ) {
+			if( i < m_resting_pid || i >= last ) {
+				bits |= b;
+			}
+		} else {
+			last %= m_num_players;
+			if( i < m_resting_pid && i >= last ) {
+				bits |= b;
+			}
+		}
+	}
+	return bits;
+}
 bool Schedule::search_balanced_pairs(vector<PlayerId>& plist, int pcnt, int ix) {		//	pcnt: ペア回数上限
 	if (ix >= plist.size())  return true;
 	auto p1 = plist[ix];
@@ -371,12 +389,60 @@ bool Schedule::is_normalized(const std::vector<PlayerId>& plist) {
 	}
 	return true;
 }
+void Schedule::gen_permutation_BM(Bitmap bits, vector<PlayerId>& plist, int ix) {
+	if( ix == plist.size() - 2 ) {		//	残り２要素
+		auto t = bits & -bits;		//	最小IDプレイヤー
+		plist[ix] = __popcnt(t-1);
+		plist[ix+1] = __popcnt((bits^t)-1);	//	残りのプレイヤー
+		//assert( plist[ix-4] < plist[ix] );
+		++m_count;
+		if( is_pair_balanced(plist) ) {
+			update_oppo_counts(plist);
+			//auto ev = calc_oppo_counts_std();
+			auto ev = eval_balance_score();
+			undo_oppo_counts(plist);
+			if( ev < m_minev ) {
+				m_minev = ev;
+				m_bestlst = plist;
+				m_bestlstlst.clear();
+				m_bestlstlst.push_back(plist);
+			//} else if( ev == m_minev && m_bestlstlst.size() < 100 ) {
+			//	for(int i = 0; i < plist.size(); i+=2) {
+			//		assert( plist[i] < plist[i+1] );
+			//	}
+			//	m_bestlstlst.push_back(plist);
+			}
+		}
+		return;
+	}
+	if( (ix&3) == 0 ) {		//	ix が４の倍数 → 以降の最小値を plist[ix] に 
+		auto t = bits & -bits;		//	最小IDプレイヤー
+		plist[ix] = __popcnt(t-1);
+		gen_permutation_BM(bits^t, plist, ix+1);
+		return;
+	}
+	auto b = bits;
+	while( b != 0 ) {
+		auto t = b & -b;		//	最小IDプレイヤー
+		plist[ix] = __popcnt(t-1);
+		b ^= t;			//	最小IDプレイヤー削除
+		if( ((ix&3)!=3 || plist[ix-1] < plist[ix]) &&		//	ペアは昇順か？
+			((ix&3)!=3 || m_oppo_counts[plist[ix-3]][plist[ix-1]]<2 &&		//	対戦は２回未満？
+							m_oppo_counts[plist[ix-3]][plist[ix]]<2 &&
+							m_oppo_counts[plist[ix-2]][plist[ix]]<2 &&
+							m_oppo_counts[plist[ix-2]][plist[ix]]<2) &&
+			((ix&1) != 1 || m_pair_counts[plist[ix-1]][plist[ix]] == 0) )	//	未ペアチェック
+		{
+			gen_permutation_BM(bits^t, plist, ix+1);		//	bits^t：使用済みIDビットをOFFに
+		}
+	}
+}
 void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 	if( ix == plist.size() - 2 ) {		//	残り２要素
 		const bool dec = plist[ix] > plist[ix+1];
 		if( dec )
 			swap(plist[ix], plist[ix+1]);
-		if( plist[ix-4] < plist[ix] ) {
+		//if( plist[ix-4] < plist[ix] ) {
 			++m_count;
 			if( is_pair_balanced(plist) ) {
 				update_oppo_counts(plist);
@@ -388,14 +454,14 @@ void Schedule::gen_permutation(vector<PlayerId>& plist, int ix) {
 					m_bestlst = plist;
 					m_bestlstlst.clear();
 					m_bestlstlst.push_back(plist);
-				} else if( ev == m_minev && m_bestlstlst.size() < 100 ) {
-					for(int i = 0; i < plist.size(); i+=2) {
-						assert( plist[i] < plist[i+1] );
-					}
-					m_bestlstlst.push_back(plist);
+				//} else if( ev == m_minev && m_bestlstlst.size() < 100 ) {
+				//	for(int i = 0; i < plist.size(); i+=2) {
+				//		assert( plist[i] < plist[i+1] );
+				//	}
+				//	m_bestlstlst.push_back(plist);
 				}
 			}
-		}
+		//}
 		if( dec )
 			swap(plist[ix], plist[ix+1]);
 		return;
@@ -513,7 +579,7 @@ void Schedule::add_balanced_round() {
 	} while( next_permutation(plist.begin(), plist.end()) );
 #endif
 	//assert(cnt == 315);
-	//cout << "m_count = " << m_count << endl;
+	cout << "m_count = " << m_count << endl;
 #else
 	shuffle(plist.begin(), plist.end(), rgen);
 	//
@@ -538,6 +604,39 @@ void Schedule::add_balanced_round() {
 		}
 	} while( next_permutation(ixlst.begin(), ixlst.end()) );
 #endif
+	if( !m_bestlstlst.is_empty() ) {
+		plist = m_bestlstlst[rgen() % m_bestlstlst.size()];
+	} else
+		plist = m_bestlst;
+	shuffle_corts(plist);
+	round.m_resting.clear();
+	for(int i = 0; i < m_num_resting; ++i)
+		round.m_resting.push_back((m_resting_pid + i) % m_num_players);
+	update_pair_counts(round);
+	update_oppo_counts(round);
+}
+//	ペア・対戦相手をバランスさせた組み合わせ追加
+//	ビット演算使用版
+void Schedule::add_balanced_round_BM() {
+	// 休憩プレイヤーIDの更新
+	m_resting_pid -= m_num_resting;
+	if( m_resting_pid < 0 ) m_resting_pid += m_num_players;
+	// 新しいラウンドを追加
+	//m_rounds.resize(m_rounds.size() + 1);
+	m_rounds.emplace_back();
+	auto& round = m_rounds.back();
+	auto& plist = round.m_playing;
+	plist.resize(m_num_courts*4);
+	// 非休憩プレイヤーリストの取得とシャッフル
+	Bitmap bits = make_not_resting_players_list();	//	非休憩プレイヤーリストを取得
+	m_minev = INT_MAX;		// 最小評価値 (ここでは標準偏差)
+	m_bestlstlst.clear();
+	//vector<PlayerId> bestlst;	// 最良のプレイヤーリスト
+	// 全ての順列を試行して最適な組み合わせを見つける (総当たり)
+	m_count = 0;
+	gen_permutation_BM(bits, plist, 0);		//	再帰的に順列生成
+	//assert(cnt == 315);
+	cout << "m_count = " << m_count << endl;
 	if( !m_bestlstlst.is_empty() ) {
 		plist = m_bestlstlst[rgen() % m_bestlstlst.size()];
 	} else

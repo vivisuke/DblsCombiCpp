@@ -9,6 +9,7 @@ using cchar = const char;
 using uchar = unsigned char;
 using ushort = unsigned short;
 using PlayerId = short;						//	0オリジン
+using Bitmap = int;
 
 //	各ラウンドでの試合組み合わせ
 struct Round {
@@ -28,6 +29,7 @@ public:
 	int		m_num_resting;			//	１ラウンドで休憩するプレイヤー人数
 	double	m_std;
 	double	m_minev;
+	std::vector<PlayerId> m_plist;		//	最良組み合わせ
 	std::vector<PlayerId> m_bestlst;	//	最良組み合わせ
 	std::vector<std::vector<PlayerId>> m_bestlstlst;
 	double	m_ave_oppo;				//	 平均対戦回数 （2*NRnd*(1-rest/n_players)/(n_players-1)）
@@ -55,6 +57,7 @@ public:
 	void	print_pair_counts() const;
 	void	print_oppo_counts() const;
 	void	make_not_resting_players_list(std::vector<PlayerId>&);		//	非休憩プレイヤーリスト取得
+	Bitmap	make_not_resting_players_list();							//	非休憩プレイヤーリスト取得
 	bool	search_balanced_pairs(std::vector<PlayerId>&, int, int);		//	なるべく重複しないペアを求める
 	void	build_first_round();
 	void	init_pair_counts();				//	
@@ -78,6 +81,7 @@ public:
 
 	void	shuffle_corts(std::vector<PlayerId>&);		//	コート単位でシャフル
 	void	gen_permutation(std::vector<PlayerId>&, int);		//	再帰的に順列生成
+	void	gen_permutation_BM(Bitmap, std::vector<PlayerId>&, int);		//	再帰的に順列生成、ビット演算版
 	double	eval_balance_score();			//	目的関数、0 ならば偏り無し
 	bool	is_legal(const std::vector<PlayerId>&);
 	bool	is_pair_balanced(const std::vector<PlayerId>&);
@@ -86,6 +90,7 @@ public:
 	void	add_random_round();
 	void	add_balanced_pair_round();
 	void	add_balanced_round();
+	void	add_balanced_round_BM();		//	bitmap 使用版
 	void	add_greedy_balanced_round();
 };
 

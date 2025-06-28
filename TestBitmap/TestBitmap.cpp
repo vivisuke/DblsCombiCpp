@@ -61,7 +61,7 @@ void gen_permutation(int ix) {
 	}
 	for(int i = ix; i < N_PLAYERS; ++i) {
 		swap(g_ar[ix], g_ar[i]);
-		if( ((ix&1)==0 || g_ar[ix-1] < g_ar[ix]) /*&&		//	ペアは昇順か？
+		if( ((ix&3)!=3 || g_ar[ix-1] < g_ar[ix]) /*&&		//	ペアは昇順か？
 			((ix&3)!=2 || g_ar[ix-2] < g_ar[ix])*/ )		//	対戦ペアは昇順か？
 		{	
 			gen_permutation(ix+1);
@@ -89,7 +89,7 @@ void gen_permutation(Bitmap bits, int ix) {
 		auto t = b & -b;		//	最小IDプレイヤー
 		g_ar[ix] = __popcnt(t-1);
 		b ^= t;			//	最小IDプレイヤー削除
-		if( ((ix&1)==0 || g_ar[ix-1] < g_ar[ix]) /*&&		//	ペアは昇順か？
+		if( ((ix&3)!=3 || g_ar[ix-1] < g_ar[ix]) /*&&		//	ペアは昇順か？
 			((ix&3)!=2 || g_ar[ix-2] < g_ar[ix])*/ )		//	対戦ペアは昇順か？
 		{	
 			gen_permutation(bits^t, ix+1);		//	bits^t：使用済みIDビットをOFFに

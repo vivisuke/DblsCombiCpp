@@ -16,20 +16,30 @@ cchar *_4c16p = "4,7-10,14 | 1,6-9,13  | 2,11-5,15 | 3,16-8,12 "
 
 int main()
 {
-	const int n_courts = 4;		//	面数
-	const int n_players = 16;	//	プレイヤー数
-	Schedule sch(n_courts, n_players);		//	面数、プレイヤー数
+	const int N_CORTS = 3;		//	面数
+	const int N_PLAYERS = 14;	//	プレイヤー数
+	const int N_ROUNDS = 7;		//	ラウンド数
+	Schedule sch(N_CORTS, N_PLAYERS);		//	面数、プレイヤー数
 #if 0
 	auto ptr = _4c16p;
 	while( *ptr != '\0' )
 		sch.add_round(ptr);
 #else
+	const bool BM = true;
+	if( !BM )
+		cout << "sch.add_balanced_round(); " << endl << endl;
+	else
+		cout << "sch.add_balanced_round_BM(); " << endl << endl;
+
 	std::chrono::system_clock::time_point  start, end; // 型は auto で可
 	start = std::chrono::system_clock::now(); // 計測開始時間
- 	for (int r = 1; r < 8; ++r) {
+ 	for (int r = 1; r < N_ROUNDS; ++r) {
 		//sch.add_random_round();
 		//sch.add_balanced_pair_round();
-		sch.add_balanced_round();
+		if (!BM)
+			sch.add_balanced_round();
+		else
+			sch.add_balanced_round_BM();
 		//sch.print();
 		//sch.print_oppo_counts();
 		cout << "rounds.size() = " << sch.m_rounds.size() << endl;
@@ -44,9 +54,9 @@ int main()
 	//sch.print_pair_counts();
 	sch.print_oppo_counts();
 
-#if 0
+#if 1
 	//cout << sch.to_HTML() << endl;
-	string filename = "table_" + to_string(n_courts) + "c" + to_string(n_players) + "p.html";
+	string filename = "table_" + to_string(N_CORTS) + "c" + to_string(N_PLAYERS) + "p.html";
 	cout << "FileName = " << filename << endl;
 	std::ifstream ifs(filename);
 	if( ifs ) {
